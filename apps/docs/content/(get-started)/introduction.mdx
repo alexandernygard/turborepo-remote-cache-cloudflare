@@ -1,0 +1,66 @@
+---
+title: Introduction
+description: What a remote cache saves your team, and why to run this one in your own account.
+---
+
+This project is an open-source remote cache server. Deploy it to Cloudflare Workers with one button, or run it on AWS Lambda, Vercel, Netlify, Node.js, Bun, or Deno. Then add a few lines to `turbo.json` to point `turbo` at it.
+
+<CacheFlow />
+
+## Stop building the same thing twice
+
+- **CI rebuilds only what changed.** A pull request rebuilds the packages it changed and the ones that depend on them. Everything else replays from the cache.
+- **A fresh clone skips its first build.** A new teammate, a new laptop, or a throwaway worktree downloads its builds instead of making them.
+- **Coding agents rerun less.** An agent that runs the test suite fifty times an afternoon replays every task whose inputs it didn't touch.
+
+## Why run this one
+
+<CardGroup cols={2}>
+    <Card title="Free to start on Cloudflare" icon="piggy-bank">
+        The Workers free plan covers 100,000 requests a day, and R2 stores 10 GB a month for free.
+        R2 charges nothing for egress, so a cache download costs no bandwidth.
+    </Card>
+    <Card title="No Vercel account" icon="key-round">
+        `turbo` talks to your server through the official Remote Cache API. There's no plugin, no
+        fork of `turbo`, and no `turbo login`.
+    </Card>
+    <Card title="A dashboard of the time saved" icon="chart-column" href="/dashboard">
+        Open the server's URL to see the time it saved, its hit rate, and which teams, CI providers,
+        and coding agents use it.
+    </Card>
+    <Card title="Signed artifacts" icon="shield-check" href="/sign-artifacts">
+        Turn on signatures, and `turbo` rejects any artifact your own machines didn't sign, even one
+        uploaded with a valid token.
+    </Card>
+    <Card title="Your choice of storage" icon="database" href="/storage">
+        R2 by default. Workers KV, any S3-compatible bucket, or anything with a Files SDK adapter
+        works too.
+    </Card>
+    <Card title="Not only Cloudflare" icon="server" href="/deploy">
+        The same server builds for Node.js, Bun, Deno, Vercel, Netlify, and AWS Lambda.
+    </Card>
+</CardGroup>
+
+## Know the trade-offs
+
+<a id="one-token-opens-every-team" />
+
+- **One token opens every team.** Anyone with the token reads and writes every team's artifacts. If two groups must stay apart, give each its own deployment.
+- **Your copy doesn't update itself.** The button copies this repository into your account. To get a new release, [merge it into your copy](/update).
+- **The dashboard is public until you restrict it.** Anyone with the URL sees your team names and usage. [Restrict access](/dashboard#restrict-access) before you share it.
+- **Serverless hosts cap artifact size.** Vercel, Netlify, and AWS Lambda accept about 5 MB per upload. Cloudflare Workers accepts 100 MB or more. [Compare platforms](/deploy#artifact-size-limits) before you pick one.
+
+## Try it
+
+<CardGroup cols={2}>
+    <Card title="Get started" icon="rocket" href="/get-started">
+        Deploy to Cloudflare and get your first remote hit.
+    </Card>
+    <Card title="How it works" icon="workflow" href="/how-it-works">
+        What `turbo` asks the server, what the server keeps, and who can read it.
+    </Card>
+</CardGroup>
+
+The project is MIT-licensed and developed on GitHub. Issues and pull requests are welcome.
+
+<GithubInfo />

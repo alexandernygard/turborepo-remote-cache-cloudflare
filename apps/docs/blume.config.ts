@@ -1,0 +1,86 @@
+import { defineConfig } from 'blume';
+import { googleAnalytics, script } from 'blume/analytics';
+import { openapi } from 'blume/reference';
+import { fileURLToPath } from 'node:url';
+
+import apiPackage from '../api/package.json' with { type: 'json' };
+
+const repositoryUrl = 'https://github.com/AdiRishi/turborepo-remote-cache-cloudflare';
+const changelogUrl = `${repositoryUrl}/blob/master/apps/api/CHANGELOG.md`;
+const measurementId = 'G-4FKXFQBLZR';
+
+const deployment =
+  process.env.DOCS_CLOUDFLARE_DEPLOYMENT === 'true'
+    ? { site: 'https://turborepo-remote-cache.dev' }
+    : { site: 'https://adirishi.github.io', base: '/turborepo-remote-cache-cloudflare' };
+
+// Pages that moved. The VitePress site also served every page at `<route>.html`.
+const movedPages: Record<string, string> = {
+  '/introduction/getting-started': '/get-started',
+  '/introduction/setup-turborepo': '/connect-turbo',
+  '/configuration/project-configuration': '/retention',
+  '/configuration/r2-storage': '/storage/r2',
+  '/configuration/kv-storage': '/storage/kv',
+};
+
+export default defineConfig({
+  content: { root: 'content' },
+  title: 'Turborepo Remote Cache',
+  description:
+    'A Turborepo remote cache that you host yourself. It runs on Cloudflare Workers, AWS Lambda, Vercel, Netlify, Node.js, Bun, and Deno. The server stores artifacts in R2, Workers KV, any S3-compatible bucket, or a Files SDK adapter.',
+  logo: { image: '/brand/lockup.svg', text: '' },
+  theme: {
+    accent: { light: '#0068e0', dark: '#0096ff' },
+    radius: 'md',
+    mode: 'system',
+    fonts: {
+      display: { name: 'Host Grotesk', weights: [500, 600, 700] },
+      body: { name: 'Host Grotesk', weights: [400, 500, 600] },
+      mono: { name: 'Martian Mono', weights: [400, 500] },
+    },
+  },
+  github: {
+    owner: 'AdiRishi',
+    repo: 'turborepo-remote-cache-cloudflare',
+    branch: 'master',
+    dir: 'apps/docs',
+  },
+  navigation: {
+    tabs: [
+      { label: 'Docs', path: '/' },
+      { label: 'API reference', path: '/api' },
+    ],
+    actions: [{ label: `v${apiPackage.version}`, href: changelogUrl }],
+  },
+  reference: [
+    openapi({
+      spec: fileURLToPath(import.meta.resolve('@turborepo-remote-cache/spec/openapi.json')),
+      overlays: ['./openapi-overlay.yaml'],
+      route: '/api',
+    }),
+  ],
+  footer: {
+    copyright:
+      'Turborepo Remote Cache is an independent, MIT-licensed project. It is not affiliated with Vercel or Cloudflare.',
+    links: [
+      { label: 'Changelog', href: changelogUrl },
+      { label: 'Contributing', href: `${repositoryUrl}/blob/master/.github/CONTRIBUTING.md` },
+    ],
+  },
+  redirects: Object.entries(movedPages).flatMap(([from, to]) => [
+    { from, to },
+    { from: `${from}.html`, to },
+  ]),
+  analytics: [
+    script({
+      content: `window['ga-disable-${measurementId}'] = !(
+        location.hostname === 'turborepo-remote-cache.dev' ||
+        (location.hostname === 'adirishi.github.io' &&
+          (location.pathname === '/turborepo-remote-cache-cloudflare' ||
+            location.pathname.startsWith('/turborepo-remote-cache-cloudflare/')))
+      );`,
+    }),
+    googleAnalytics({ id: measurementId }),
+  ],
+  deployment,
+});
